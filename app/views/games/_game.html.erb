@@ -1,0 +1,6 @@
+<div class="game">
+  <%= game.idhash %>
+  <% if game.p2 == nil %>
+    <%= link_to "join", "/"+game.idhash %>
+  <% end %>
+</div>

@@ -1,9 +1,12 @@
 Rails.application.routes.draw do
-  get 'games/new'
+  
+  root 'games#index'  
 
-  get 'games/:gamehash', to: 'games#join'
+  get '/new', to: 'games#new'
 
-  get 'games/:gamehash/:playerhash/:move', to: 'games#move'
+  get '/:gamehash', to: 'games#join'
+
+  get '/:gamehash/:playerhash/:move', to: 'games#move'
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".

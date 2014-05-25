@@ -1,0 +1,7 @@
+<% if @games.count > 0 %>
+  <%= link_to "Create a game", "/new" %>
+  <%= render @games %>
+<% else %>
+  <h1>No games here</h1>
+  <h2><%= link_to "Create one", "/new" %></h2>
+<% end %>
