@@ -1,5 +1,5 @@
 class GamesController < ApplicationController
-  
+
   # Display an index of all open games
   def index
     tmp = Game.all
@@ -17,26 +17,12 @@ class GamesController < ApplicationController
     game = Game.new
     # Gemerate a random game ID
     game.idhash = SecureRandom.urlsafe_base64(10)
+    game.move_number = 0
     if (game.save)
-      render text: "GOOD\n" + game.idhash
+      render plain: "GOOD\n" + game.idhash
     else
-      render text: "ERROR CREATING"
+      render plain: "ERROR CREATING"
     end
-  end
-
-  # Show the game log
-  def display(game)
-    string = ""
-    for move in game.moves
-      string += move.action + "\n"
-    end
-    render text: string
-  end
-
-  # Allow a player to ask what their opponent has recently done
-  def ask
-    # TODO: Implement
-    render text: "TODO: Implement"
   end
 
   # Join the game
@@ -50,9 +36,9 @@ class GamesController < ApplicationController
         game.p1 = SecureRandom.urlsafe_base64(10)
         if (game.save)
           # Tell the player that they will be playing as white, and what their ID is
-          render text: "WHITE\n" + game.p1
+          render plain: "WHITE\n" + game.p1
         else
-          render text: "ERROR"
+          render plain: "ERROR"
         end
       
       # Player 2 joins
@@ -61,27 +47,38 @@ class GamesController < ApplicationController
         game.p2 = SecureRandom.urlsafe_base64(10)
         if (game.save)
           # Give Black their ID
-          render text: "BLACK\n" + game.p2
+          render plain: "BLACK\n" + game.p2
         else
-          render text: "ERROR SAVING"
+          render plain: "ERROR SAVING"
         end
       
       # Both players have joined
       else
-        render text: "GAME FULL"
+        render plain: "GAME FULL"
       end
     else
-      render text: "NO SUCH GAME"
+      render plain: "NO SUCH GAME"
     end
   end
 
   def show
     game = Game.find_by(idhash: params[:gamehash])
-    if game
+    if game and game.p2 != nil
       # Show the game log
-      display game
+      movenum = 1
+      string = "1. "
+      for move in game.moves
+        if move.move_number != movenum
+          movenum = move.move_number
+          string += "\n"+movenum.to_s+"."
+        end
+        string += " " + move.action
+      end
+      render text: string
+    elsif game
+      render plain: "NOT STARTED"
     else
-      render text: "NO SUCH GAME"
+      render plain: "NO SUCH GAME"
     end
   end
 
@@ -90,31 +87,41 @@ class GamesController < ApplicationController
     game = Game.find_by(idhash: params[:gamehash])
 
     # If the player trying to move didn't make the previous move
-    if (game.moves.last == nil && params[:playerhash] == game.p1) ||
-       (game.moves.last != nil && game.moves.last.player != params[:playerhash])
-    
-      # Create a new move, and populate it with data
-      move = Move.new
-      move.player = params[:playerhash]
-      move.action = params[:move]
-      move.game = game
-      move.save
-
-      # Add the move the the game
-      game.moves << move
-      game.save
-
+    if (game.moves.last == nil and params[:playerhash] == game.p1) or
+       (game.moves.last != nil and game.moves.last.player != params[:playerhash])
       # Validate the move
       # TODO: Real validation
-      if (true)
-        render text: "GOOD"
+      validated = params[:move] =~ /([NBRQK]?[a-e]?[1-8]?x?[a-h][1-8](=[NBRQ])?(\+|#)?|O-O(-O)?)/
+      if (validated)
+        render plain: "GOOD"
+        if params[:playerhash] == game.p1
+          game.move_number += 1
+        end
+
+        # Create a new move, and populate it with data
+        move = Move.new
+        move.player = params[:playerhash]
+        move.action = params[:move]
+        move.move_number = game.move_number
+        move.game = game
+        move.save
+
+        # Add the move the the game
+        game.moves << move
+        game.save
       else
         # TODO: Add reasons to the response
-        render text: "ILLEGAL MOVE"
+        render plain: "ILLEGAL MOVE"
       end
     else
       # It's not the player's turn
-      render text: "NOT YOUR TURN"
+      render plain: "NOT YOUR TURN"
     end
+  end
+
+   # Allow a player to ask what their opponent has recently done
+  def ask
+    # TODO: Implement
+    render plain: "TODO: Implement"
   end
 end

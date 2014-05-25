@@ -18,7 +18,10 @@ They will return:
 
 Requests to /:game should be used to view the game transcript.
 They will return
-  [ MOVE ], [ MOVE ], [ ... ]
+  "NOT STARTED"
+      Before both players have joined,
+
+  [ MOVENUM ]. [ MOVE ] [ MOVE ], [ ... ]
       after both players have joined,
 
   "NO SUCH GAME"
@@ -55,7 +58,11 @@ They will return:
       if the move was accepted,
   
   "ILLEGAL MOVE", [ ... REASON ]
-      if the move is illegal for some reason, and an optional reason (for example, moving yourself into check)
-  
+      if the move is illegal for some reason, and an optional reason
+      [ REASON ] may be one of:
+          "INVALID PGN" if the string doesn't meet the PGN standards (asdf, for example, or Ns9)
+          "INTO CHECK" if you are trying to move yourself into check,
+          "IMPROPER MOTION" if a piece tries to move somewhere it shouldn't
+
   "NOT YOUR TURN"
       if it is not your turn
