@@ -1,51 +1,55 @@
 #!/usr/bin/python
 import urllib, sys
 
-site = "http://localhost:3000/"
+class Player:
+  def __init__(self, game, pid):
+    self.game = game
+    self.pid = pid
 
-def newgame():
-  # None on failure, ID on success
-  response = urllib.urlopen(site+"new").read()
-  if response == "ERROR CREATING":
-    return None
-  else:
-    # Strip off "GOOD"
-    return response.split("\n")[1]
+  #TODO: Warn if not the player's turn, other errors
+  def make_move(self, move):
+    # True on move success, False on move failure
+    response = urllib.urlopen(self.game.site+self.game.gid+"/"+self.pid+"/"+move).read()
+    if response == "GOOD":
+      return True
+    else:
+      return False
 
-def join(game):
-  # None on failure, ID on success
-  response = urllib.urlopen(site+game+"/join").read()
-  response = response.split("\n")
-  if response[0] == "WHITE" or response[0] == "BLACK":
-    return response[1]
-  else:
-    return None
+  def poll(self):
+    # Return False if there's no new move, and the move if there is one
+    response = urllib.urlopen(self.game.site+self.game.gid+"/"+self.pid)
+    if response == "NO NEW MOVE":
+      return False
+    else:
+      return response.split("\n")[1]
 
-#TODO: Warn if not the player's turn
-def make_move(player, move):
-  # True on move success, False on move failure
-  response = urllib.urlopen(site+game+"/"+player+"/"+move).read()
-  if response == "GOOD":
-    return True
-  else:
-    return False
+class Game:
+  def __init__(self, site="http://localhost:3000/",game_name = ""):
+    self.site=site
+    if game_name == "":
+      response = urllib.urlopen(site+"new").read()
+      if response == "ERROR CREATING":
+        self.gid = None
+      else: # Strip off "GOOD"
+        self.gid = response.split("\n")[1]
+    else:
+      self.gid = game_name
 
-def get(game):
-  # None if game isn't ready to be listed, a transcript if it is
-  response = urllib.urlopen(site+game).read()
-  if response == "NO SUCH GAME": # TODO: Add more error conditions
-    return None
-  else:
-    return response
+  def join(self):
+    response = urllib.urlopen(self.site+self.gid+"/join").read()
+    response = response.split("\n")
+    if response[0] == "WHITE" or response[0] == "BLACK":
+      return Player(self, response[1])
+    else:
+      return None
 
-def new_move(player):
-  # Return False if there's no new move, and the move if there is one
-  response = urllib.urlopen(site+game+"/"+player)
-  if response == "NO NEW MOVE":
-    return False
-  else:
-    return response.split("\n")[1]
-
+  def get(self):
+    # None if game isn't ready to be listed, a transcript if it is
+    response = urllib.urlopen(self.site+self.gid).read()
+    if response == "NO SUCH GAME": # TODO: Add more error conditions
+      return None
+    else:
+      return response
 
 # Testing purposes
 if __name__ == "__main__":
