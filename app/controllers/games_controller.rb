@@ -23,7 +23,7 @@ class GamesController < ApplicationController
   def display(game)
     string = ""
     for move in game.moves
-      string += move + "\n"
+      string += move.action + "\n"
     end
     render text: string
   end
@@ -71,10 +71,10 @@ class GamesController < ApplicationController
        (game.moves.last != nil && game.moves.last.player != params[:playerhash])
       move = Move.new
       move.player = params[:playerhash]
-      move.string = params[:move]
+      move.action = params[:move]
       move.save
 
-      game.moves.add move
+      game.moves << move
       game.save
       render text: "GOOD"
     else
