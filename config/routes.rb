@@ -4,7 +4,11 @@ Rails.application.routes.draw do
 
   get '/new', to: 'games#new'
 
-  get '/:gamehash', to: 'games#join'
+  get '/:gamehash', to: 'games#show'
+
+  get '/:gamehash/join', to: 'games#join'
+
+  get '/:gamehash/:playerhash', to: 'games#ask'
 
   get '/:gamehash/:playerhash/:move', to: 'games#move'
 

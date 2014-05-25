@@ -1,7 +1,10 @@
 class GamesController < ApplicationController
+  
+  # Display an index of all open games
   def index
     tmp = Game.all
     @games = []
+    # Only include the open games in the array
     for item in tmp
       if item.p2 == nil
         @games << item
@@ -9,13 +12,15 @@ class GamesController < ApplicationController
     end
   end
 
+  # Create a new game
   def new
     game = Game.new
+    # Gemerate a random game ID
     game.idhash = SecureRandom.urlsafe_base64(10)
     if (game.save)
-      render text: "SUCCEED\n" + game.idhash
+      render text: "GOOD\n" + game.idhash
     else
-      render text: "FAIL"
+      render text: "ERROR CREATING"
     end
   end
 
@@ -28,6 +33,12 @@ class GamesController < ApplicationController
     render text: string
   end
 
+  # Allow a player to ask what their opponent has recently done
+  def ask
+    # TODO: Implement
+    render text: "TODO: Implement"
+  end
+
   # Join the game
   def join
     game = Game.find_by(idhash: params[:gamehash])
@@ -38,9 +49,10 @@ class GamesController < ApplicationController
         logger.debug("Adding player 1")
         game.p1 = SecureRandom.urlsafe_base64(10)
         if (game.save)
-          render text: game.p1 + "\nWHITE"
+          # Tell the player that they will be playing as white, and what their ID is
+          render text: "WHITE\n" + game.p1
         else
-          render text: "ERROR SAVING"
+          render text: "ERROR"
         end
       
       # Player 2 joins
@@ -48,15 +60,26 @@ class GamesController < ApplicationController
         logger.debug("Adding player 2")
         game.p2 = SecureRandom.urlsafe_base64(10)
         if (game.save)
-          render text: game.p2 + "\nBLACK"
+          # Give Black their ID
+          render text: "BLACK\n" + game.p2
         else
           render text: "ERROR SAVING"
         end
       
-      # Both players have joined, show the game log
+      # Both players have joined
       else
-        display(game)
+        render text: "GAME FULL"
       end
+    else
+      render text: "NO SUCH GAME"
+    end
+  end
+
+  def show
+    game = Game.find_by(idhash: params[:gamehash])
+    if game
+      # Show the game log
+      display game
     else
       render text: "NO SUCH GAME"
     end
@@ -65,19 +88,32 @@ class GamesController < ApplicationController
   # Make a move
   def move
     game = Game.find_by(idhash: params[:gamehash])
-    # If the player trying to move HASN'T made the previous move
-    shouldplay = false
+
+    # If the player trying to move didn't make the previous move
     if (game.moves.last == nil && params[:playerhash] == game.p1) ||
        (game.moves.last != nil && game.moves.last.player != params[:playerhash])
+    
+      # Create a new move, and populate it with data
       move = Move.new
       move.player = params[:playerhash]
       move.action = params[:move]
+      move.game = game
       move.save
 
+      # Add the move the the game
       game.moves << move
       game.save
-      render text: "GOOD"
+
+      # Validate the move
+      # TODO: Real validation
+      if (true)
+        render text: "GOOD"
+      else
+        # TODO: Add reasons to the response
+        render text: "ILLEGAL MOVE"
+      end
     else
+      # It's not the player's turn
       render text: "NOT YOUR TURN"
     end
   end

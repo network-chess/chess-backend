@@ -1,0 +1,61 @@
+API SPEC:
+
+If a call returns a list, items are delimted by newlines
+IDs are 14 digit base-64 numbers
+:game_id refers to the ID of the game
+:player_id refers to one of the two player IDs
+Items in quotes are literal strings
+Items in square-braces are descriptive
+If an item has ... before it, then it is optional
+
+Requests to /new should be used to create a new game.
+They will return:
+  "GOOD", :game_id 
+      on success,
+  
+  "ERROR CREATING"
+      on failure
+
+Requests to /:game should be used to view the game transcript.
+They will return
+  [ MOVE ], [ MOVE ], [ ... ]
+      after both players have joined,
+
+  "NO SUCH GAME"
+      if the game does not exist
+
+Requests to /:game/join should be used to join the game, or ask for the full game log.
+They will return:
+  "WHITE", :player_id
+      on the first success,
+  
+  "BLACK", :player_id
+      on the second success,
+  
+  "ERROR SAVING"
+      on failure,
+
+  "GAME FULL"
+      if the game is full,
+  
+  "NO SUCH GAME"
+      if the game does not exist
+
+Requests to /:game/:player should be used by that player to request updates.
+They will return:
+  "NEW MOVE", [ MOVE ]
+      if the last move was by their opponent, with more than one move in certain cases
+
+  "NO NEW MOVE"
+      if the last move was by them, or if there is no previous move
+
+Requests to /:game/:player/:move should be by a player to submit a move.
+They will return:
+  "GOOD"
+      if the move was accepted,
+  
+  "ILLEGAL MOVE", [ ... REASON ]
+      if the move is illegal for some reason, and an optional reason (for example, moving yourself into check)
+  
+  "NOT YOUR TURN"
+      if it is not your turn
