@@ -1,3 +1,52 @@
 // Place all the styles related to the Games controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+@import "config.css";
+
+html, body {
+    height: 100%;
+}
+
+.wrapper {
+    min-height: 100%;
+    box-shadow: 0 4px 8px -4px rgba(0, 0, 0, 0.5);
+    -moz-box-shadow: 0 4px 8px -4px rgba(0, 0, 0, 0.5);
+    -webkit-box-shadow: 0 4px 8px -4px rgba(0, 0, 0, 0.5);
+}
+
+.header {
+    height: 100px;
+    padding: 20px;
+    margin-bottom: 10px;
+    background-color: #222;
+    color: #eee;
+    font-size: 32px;
+}
+
+.header:after {
+    width: 100%;
+    margin-top: -5px;
+    border-bottom: 1px dashed white;
+    content: "";
+}
+
+.footer {
+    height: 100px;
+    padding: 20px;
+    background-color: #aaaaaf;
+    color: #222;
+    font-size: 18px;
+    position: relative;
+    z-index: -1;
+}
+
+.github-buttons {
+    width: 350px;
+    height: 28px;
+    margin: 0 auto;
+}
+
+.copy {
+    text-align: center;
+    font-size: 10px;
+}
