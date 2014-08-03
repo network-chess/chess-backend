@@ -1,7 +1,20 @@
-<% if @games.count > 0 %>
-  <%= link_to "Create a game", "/new" %>
-  <%= render @games %>
-<% else %>
-  <h1>No games here</h1>
-  <h2><%= link_to "Create one", "/new" %></h2>
-<% end %>
+<div class="games">
+    <h1>Open Games</h1>
+
+    <% if @open_games.count > 0 %>
+      <h3><%= link_to "Create a new game", "/new" %></h3>
+      <%= render @open_games %>
+    <% else %>
+      <h3>No games here <%= link_to "(Create one)", "/new" %></h3>
+    <% end %>
+</div>
+
+<div class="games">
+    <h1>Running Games</h1>
+
+    <% if @running_games.count > 0 %>
+        <%= render @running_games %>
+    <% else %>
+        <h3>No games here</h3>
+    <% end %>
+</div>

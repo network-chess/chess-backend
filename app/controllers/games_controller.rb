@@ -2,12 +2,15 @@ class GamesController < ApplicationController
 
   # Display an index of all open games
   def index
-    tmp = Game.all
-    @games = []
+    @games = Game.all
+    @running_games = []
+    @open_games = []
     # Only include the open games in the array
-    for item in tmp
+    for item in @games
       if item.p2 == nil
-        @games << item
+        @open_games << item
+      else 
+        @running_games << item
       end
     end
   end
@@ -17,7 +20,7 @@ class GamesController < ApplicationController
     game = Game.new
     # Gemerate a random game ID
     game.idhash = SecureRandom.urlsafe_base64(10)
-    game.move_number = 0
+    game.move_number = 1
     if (game.save)
       render plain: "GOOD\n" + game.idhash
     else
@@ -66,7 +69,24 @@ class GamesController < ApplicationController
     if game and game.p2 != nil
       # Show the game log
       movenum = 1
-      string = "1. "
+      string = '[Event "%{event}"]
+[Site "%{site}"]
+[Date "%{date}"]
+[Round "%{round}"]
+[White "%{white_name}"]
+[Black "%{black_name}"]
+[Result "%{result}"]
+[Mode "ICS"]
+1.' % {
+        event: "Online Game",
+        site: "Online",
+        date: game.created_at.to_time.strftime('%Y.%m.%d'),
+        round: "0",
+        white_name: "White",
+        black_name: "Black",
+        result: "*" }
+# [SetUp "1"]
+# [FEN "rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1"]
       for move in game.moves
         if move.move_number != movenum
           movenum = move.move_number
@@ -74,7 +94,7 @@ class GamesController < ApplicationController
         end
         string += " " + move.action
       end
-      render text: string
+      render plain: string
     elsif game
       render plain: "NOT STARTED"
     else
@@ -94,7 +114,7 @@ class GamesController < ApplicationController
       validated = params[:move] =~ /([NBRQK]?[a-e]?[1-8]?x?[a-h][1-8](=[NBRQ])?(\+|#)?|O-O(-O)?)/
       if (validated)
         render plain: "GOOD"
-        if params[:playerhash] == game.p1
+        if params[:playerhash] == game.p2
           game.move_number += 1
         end
 
