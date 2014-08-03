@@ -1,6 +1,13 @@
 <div class="game">
-  <%= game.idhash %>
-  <% if game.p2 == nil %>
-    <%= link_to "join", "/"+game.idhash %>
-  <% end %>
+    <% if game.p2 == nil %>
+        <%= link_to "Join Game", "/"+game.idhash+"/join" %>
+    <% else %>
+        Turn: <%= game.move_number %>,
+        <% if game.moves.last != nil && game.moves.last.player == game.p1 %>
+            Black to move.
+        <% else %>
+            White to move.
+        <% end %>
+    <%= link_to "View Game", "/"+game.idhash %>
+    <% end %>
 </div>
