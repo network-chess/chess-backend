@@ -40,10 +40,17 @@ html, body {
     z-index: -1;
 }
 
-.github-buttons {
-    width: 350px;
-    height: 28px;
+.media-buttons {
+    width:  120px;
+    height: 50px;
     margin: 0 auto;
+    a {
+        color: #333;
+    }
+    a:hover {
+        color: #222;
+        text-decoration: none;
+    }
 }
 
 .copy {

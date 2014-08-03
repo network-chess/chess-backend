@@ -121,7 +121,11 @@ class GamesController < ApplicationController
 
    # Allow a player to ask what their opponent has recently done
   def ask
-    # TODO: Implement
-    render plain: "TODO: Implement"
+    game = Game.find_by(idhash: params[:gamehash])
+    if (game.moves.last == nil) or (game.moves.last.player == params[:playerhash])
+      render plain: "NO NEW MOVE"
+    else
+      render plain: "NEW MOVE\n"+game.moves.last.action
+    end
   end
 end
